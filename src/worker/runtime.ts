@@ -93,16 +93,17 @@ export function startRuntime(port: PortLike, host: RuntimeHost): void {
         send({ t: 'done', runId: m.runId, ok: false, error: cloneShape(err), opsUsed: seq, logsDropped: captured.dropped() });
       }
     };
+    const tree = buildTree(m.fnNames, call, new Set(m.positional));
+    const bare = m.spread ? Object.keys(tree).filter((k) => /^[A-Za-z_$][\w$]*$/.test(k) && k !== m.root && !m.valueNames.includes(k)) : [];
     let fn: (...args: unknown[]) => Promise<unknown>;
     try {
-      fn = new AsyncFunction(m.root, 'console', ...m.valueNames, m.code);
+      fn = new AsyncFunction(m.root, 'console', ...m.valueNames, ...bare, m.code);
     } catch (err) {
       finish({ ok: false, error: shapeOf(err) });
       return;
     }
     try {
-      const tree = buildTree(m.fnNames, call);
-      const value = await fn(tree, captured.console, ...m.valueNames.map((n) => m.values[n]));
+      const value = await fn(tree, captured.console, ...m.valueNames.map((n) => m.values[n]), ...bare.map((k) => tree[k]));
       const size = serialisedSize(value);
       if (size > m.caps.maxOutputBytes) {
         finish({ ok: false, error: { name: 'SandboxLimit', message: `result larger than ${m.caps.maxOutputBytes} bytes (${size})` }, tooLarge: true });

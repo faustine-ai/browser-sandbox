@@ -29,6 +29,10 @@ export interface RunMessage {
   root: string;
   /** Dotted function names the tree exposes. */
   fnNames: string[];
+  /** Names whose leaf forwards every argument as an array (`fn(a, b)` → input `[a, b]`). */
+  positional: string[];
+  /** Also expose the tree's top-level keys as bare identifiers. */
+  spread: boolean;
   /** Extra identifiers the code sees, with their cloned values. */
   valueNames: string[];
   values: Record<string, unknown>;

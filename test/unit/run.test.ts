@@ -15,7 +15,7 @@ const functions = defineFunctions({
   unclonable: () => () => 1,
   big: (n) => 'x'.repeat(n as number),
   count: () => ++hits.count,
-  del: { call: (x) => ({ ok: true, id: (x as { id: number }).id, n: ++hits.del }), approval: true },
+  del: { call: (x: unknown) => ({ ok: true, id: (x as { id: number }).id, n: ++hits.del }), approval: true },
 });
 
 const caps = { ...DEFAULT_CAPS, timeoutMs: 5000, busyMs: 2000 };
@@ -58,6 +58,13 @@ describe('executeRun', () => {
   it('a failing function rejects the call', async () => {
     const r = await go({ code: 'try { await sdk.fail() } catch (e) { return e.name + ":" + e.message }' });
     expect(r).toMatchObject({ status: 'ok', value: 'Error:nope', calls: [{ ok: false, error: 'Error: nope' }] });
+  });
+
+  it('positional functions receive their arguments spread; spread exposes bare identifiers', async () => {
+    const fns = defineFunctions({ ...functions, 'util.sum': { call: (...a: unknown[]) => (a as number[]).reduce((x, y) => x + y, 0), positional: true }, external_hi: (n) => `hi ${String(n)}` });
+    const r = await executeRun(deps(), resolveRun({ code: 'return [await sdk.util.sum(1, 2, 3), await external_hi("x"), typeof util]', functions: fns, scope: { spread: true } }, 'r', caps));
+    expect(r).toMatchObject({ status: 'ok', value: [6, 'hi x', 'object'] });
+    expect(r.calls[0]).toMatchObject({ fn: 'util.sum', input: [1, 2, 3] });
   });
 
   it('a BigInt result clones although it has no JSON form', async () => {
@@ -277,7 +284,7 @@ describe('protocol edge cases on the host', () => {
     pair.link.onMessage(() => {});
     const seen: unknown[] = [];
     pair.link.onMessage((m) => seen.push(m));
-    const run = { t: 'run' as const, runId: 'a', code: 'await new Promise(r => setTimeout(r, 100))', root: 'sdk', fnNames: [], valueNames: [], values: {}, caps: { maxOutputBytes: 1000, maxLogLines: 10, maxLogChars: 100 }, serialize: false };
+    const run = { t: 'run' as const, runId: 'a', code: 'await new Promise(r => setTimeout(r, 100))', root: 'sdk', fnNames: [], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 1000, maxLogLines: 10, maxLogChars: 100 }, serialize: false };
     pair.link.post(run);
     pair.link.post({ ...run, runId: 'b' });
     await new Promise((r) => setTimeout(r, 200));

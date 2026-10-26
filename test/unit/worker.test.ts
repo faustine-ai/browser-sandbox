@@ -34,7 +34,7 @@ describe('pending', () => {
     expect(pendingSeq({})).toBeNull();
     expect(pendingSeq(null)).toBeNull();
     expect(p.then).toBeUndefined();
-    expect((p as Record<symbol, unknown>)[Symbol.toStringTag]).toBeUndefined();
+    expect((p as unknown as Record<symbol, unknown>)[Symbol.toStringTag]).toBeUndefined();
     const throws = (f: () => unknown) => expect(f).toThrow(expect.objectContaining({ name: PENDING_OBSERVED }));
     throws(() => p.x);
     throws(() => Object.keys(p));
@@ -106,6 +106,8 @@ describe('tree', () => {
     expect(Object.isFrozen(a.b)).toBe(true);
     expect((t as { constructor?: unknown }).constructor).toBeUndefined();
     expect((e.f as { name: string }).name).toBe('f');
+    const pos = buildTree(['p'], async (_fn, input) => input, new Set(['p']));
+    expect(await (pos.p as (...a: unknown[]) => Promise<unknown>)(1, 2)).toEqual([1, 2]);
   });
 });
 
@@ -132,7 +134,7 @@ describe('runtime helpers', () => {
     port.onmessage!({ data: null });
     port.onmessage!({ data: { t: 'result', runId: 'none', callId: 'x', ok: true, value: 1 } });
     port.onmessage!({ data: { t: 'abort', runId: 'none' } });
-    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'return 1', root: 'sdk', fnNames: [], valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
+    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'return 1', root: 'sdk', fnNames: [], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
     await new Promise((r) => setTimeout(r, 10));
     expect(sent).toEqual([{ t: 'done', runId: 'r', ok: true, value: 1, opsUsed: 0, logsDropped: 0 }]);
     port.onmessage!({ data: { t: 'result', runId: 'r', callId: 'r:9', ok: true, value: 1 } });
@@ -142,7 +144,7 @@ describe('runtime helpers', () => {
     const sent: unknown[] = [];
     const port = { onmessage: null as ((ev: { data: unknown }) => void) | null, postMessage: (m: unknown) => sent.push(m) };
     startRuntime(port, { scope: {} });
-    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'await new Promise(r => setTimeout(r, 20)); return 1', root: 'sdk', fnNames: [], valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
+    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'await new Promise(r => setTimeout(r, 20)); return 1', root: 'sdk', fnNames: [], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
     port.onmessage!({ data: { t: 'abort', runId: 'r' } });
     await new Promise((r) => setTimeout(r, 50));
     expect(sent).toEqual([]);
@@ -162,12 +164,12 @@ describe('runtime helpers', () => {
       },
     };
     startRuntime(port, { scope: {} });
-    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'return () => 1', root: 'sdk', fnNames: [], valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
+    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'return () => 1', root: 'sdk', fnNames: [], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 10, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
     await new Promise((r) => setTimeout(r, 10));
     expect(sent[0]).toMatchObject({ t: 'done', ok: false, error: { name: 'CloneError' } });
     sent.length = 0;
     failNext = true;
-    port.onmessage!({ data: { t: 'run', runId: 'r2', code: 'try { await sdk.f(1) } catch (e) { return e.name }', root: 'sdk', fnNames: ['f'], valueNames: [], values: {}, caps: { maxOutputBytes: 100, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
+    port.onmessage!({ data: { t: 'run', runId: 'r2', code: 'try { await sdk.f(1) } catch (e) { return e.name }', root: 'sdk', fnNames: ['f'], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 100, maxLogLines: 1, maxLogChars: 10 }, serialize: false } });
     await new Promise((r) => setTimeout(r, 10));
     expect(sent[0]).toMatchObject({ t: 'done', ok: true, value: 'CloneError' });
   });

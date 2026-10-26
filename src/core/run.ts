@@ -27,6 +27,7 @@ export interface ResolvedRun {
   functions: FunctionMap;
   root: string;
   values: Record<string, unknown>;
+  spread: boolean;
   approval: ApprovalOptions;
   caps: Caps;
   signal?: AbortSignal;
@@ -55,6 +56,7 @@ export function resolveRun(options: RunOptions, runId: string, caps: Caps): Reso
     functions: options.functions,
     root,
     values,
+    spread: options.scope?.spread ?? false,
     approval: options.approval ?? { mode: 'deny' },
     caps: { ...caps, ...stripUndefined(options.caps ?? {}) },
     signal: options.signal,
@@ -151,7 +153,7 @@ export function executeRun(deps: RunDeps, run: ResolvedRun, replay: ReplayTable 
     const execute = async (fn: string, input: unknown): Promise<Outcome> => {
       const entry = run.functions[fn]!;
       try {
-        const value = await entry.call(input);
+        const value = entry.positional && Array.isArray(input) ? await (entry.call as (...a: unknown[]) => unknown)(...input) : await entry.call(input);
         return { ok: true, value };
       } catch (err) {
         return { ok: false, error: errorShape(err) };
@@ -337,6 +339,8 @@ export function executeRun(deps: RunDeps, run: ResolvedRun, replay: ReplayTable 
           code: run.code,
           root: run.root,
           fnNames: Object.keys(run.functions),
+          positional: Object.keys(run.functions).filter((n) => run.functions[n]!.positional === true),
+          spread: run.spread,
           valueNames: Object.keys(run.values),
           values: run.values,
           caps: { maxOutputBytes: run.caps.maxOutputBytes, maxLogLines: run.caps.maxLogLines, maxLogChars: run.caps.maxLogChars },

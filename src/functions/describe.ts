@@ -16,7 +16,7 @@ export function describe(functions: FunctionMap, options: DescribeOptions = {}):
       .map((n) => {
         const e = functions[n]!;
         const flags = e.approval ? ' (requires approval)' : '';
-        return `- ${root}.${n}(input)${flags}${e.description ? ` — ${e.description}` : ''}`;
+        return `- ${root}.${n}(${e.positional ? '...args' : 'input'})${flags}${e.description ? ` — ${e.description}` : ''}`;
       })
       .join('\n');
   }
@@ -44,7 +44,7 @@ export function describe(functions: FunctionMap, options: DescribeOptions = {}):
         const e = functions[child.leaf]!;
         const doc = [e.description, e.approval ? 'Requires the user\'s approval.' : undefined].filter(Boolean).join(' ');
         if (doc) lines.push(`${pad}/** ${doc} */`);
-        const input = e.input ? `input: ${JSON.stringify(e.input)}` : 'input?: unknown';
+        const input = e.positional ? '...args: unknown[]' : e.input ? `input: ${JSON.stringify(e.input)}` : 'input?: unknown';
         if (child.children.size === 0) lines.push(`${pad}${key}(${input}): Promise<unknown>;`);
         else {
           lines.push(`${pad}${key}: ((${input}) => Promise<unknown>) & {`);

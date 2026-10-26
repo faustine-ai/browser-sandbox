@@ -55,10 +55,11 @@ describe('describe', () => {
     'books.remove': { call: () => 1, approval: true },
     help: { call: () => 1, description: 'Help' },
     'help.topics': () => 1,
+    sum: { call: () => 1, positional: true },
   });
 
   it('index format', () => {
-    expect(describeFns(f)).toBe(['- sdk.books.list(input) — List books', '- sdk.books.remove(input) (requires approval)', '- sdk.help(input) — Help', '- sdk.help.topics(input)'].join('\n'));
+    expect(describeFns(f)).toBe(['- sdk.books.list(input) — List books', '- sdk.books.remove(input) (requires approval)', '- sdk.help(input) — Help', '- sdk.help.topics(input)', '- sdk.sum(...args)'].join('\n'));
   });
 
   it('ts format', () => {
@@ -69,5 +70,6 @@ describe('describe', () => {
     expect(ts).toContain("/** Requires the user's approval. */");
     expect(ts).toContain('help: ((input?: unknown) => Promise<unknown>) & {');
     expect(ts).toContain('topics(input?: unknown): Promise<unknown>;');
+    expect(ts).toContain('sum(...args: unknown[]): Promise<unknown>;');
   });
 });

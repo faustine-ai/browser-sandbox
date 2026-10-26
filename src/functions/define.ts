@@ -6,6 +6,8 @@ export interface FunctionEntry {
   call: FunctionImpl;
   /** Hold this call for a human (per the run's approval mode). */
   approval?: boolean;
+  /** The code calls it with several arguments; `call` receives them spread. */
+  positional?: boolean;
   /** For `describe()`. */
   description?: string;
   /** A JSON Schema of the input, for `describe()`. */

@@ -87,6 +87,8 @@ export interface RunOptions {
     root?: string;
     /** Values cloned into the worker and exposed by name. */
     values?: Record<string, unknown>;
+    /** Also expose the tree's top-level functions as bare identifiers (`external_x(...)`). */
+    spread?: boolean;
   };
   approval?: ApprovalOptions;
   caps?: Partial<Caps>;
