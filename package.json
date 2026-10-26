@@ -1,0 +1,41 @@
+{
+  "name": "@faustine-ai/browser-sandbox",
+  "version": "0.1.0",
+  "description": "Run model-written JavaScript in the browser inside a worker in an opaque-origin frame: no network, no DOM, only the functions you hand it. Approval at the bridge, real timeouts, adapters for the AI SDK, Cloudflare codemode and TanStack AI.",
+  "keywords": ["sandbox", "browser", "worker", "iframe", "csp", "code-mode", "ai", "llm", "tools", "ai-sdk"],
+  "license": "MIT",
+  "homepage": "https://github.com/faustine-ai/browser-sandbox#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/faustine-ai/browser-sandbox.git" },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" },
+    "./ai": { "types": "./dist/ai.d.ts", "import": "./dist/ai.js", "require": "./dist/ai.cjs" },
+    "./codemode": { "types": "./dist/codemode.d.ts", "import": "./dist/codemode.js", "require": "./dist/codemode.cjs" },
+    "./tanstack": { "types": "./dist/tanstack.d.ts", "import": "./dist/tanstack.js", "require": "./dist/tanstack.cjs" },
+    "./frame": { "types": "./dist/frame.d.ts", "import": "./dist/frame.js", "require": "./dist/frame.cjs" }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "embeds": "node scripts/embeds.mjs",
+    "typecheck": "npm run embeds && tsc --noEmit",
+    "test": "npm run embeds && vitest run --coverage",
+    "test:watch": "npm run embeds && vitest",
+    "test:browser": "npm run build && playwright test",
+    "build": "npm run embeds && node scripts/build.mjs",
+    "size": "node scripts/size.mjs",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build && npm run size"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.2.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.0"
+  }
+}
