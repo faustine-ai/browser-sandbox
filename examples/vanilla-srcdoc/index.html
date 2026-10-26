@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- Open this file through any static server after `npm run build` at the
+     repo root (it imports ../../dist/index.js). No sandbox route needed:
+     srcdoc mode. -->
+<html>
+<head><meta charset="utf-8"><title>browser-sandbox — vanilla example</title></head>
+<body>
+<h1>browser-sandbox</h1>
+<textarea id="code" rows="8" cols="80">
+const open = await sdk.orders.list({ status: "open" });
+console.log("open orders", open.length);
+for (const o of open) if (o.total > 100) await sdk.orders.cancel({ id: o.id });
+return open.map(o => o.id);
+</textarea>
+<br><button id="run">Run</button>
+<pre id="out"></pre>
+<script type="module">
+  import { createSandbox, defineFunctions } from '../../dist/index.js';
+
+  const orders = [{ id: 1, total: 50 }, { id: 2, total: 150 }, { id: 3, total: 200 }];
+  const functions = defineFunctions({
+    'orders.list':   ({ status }) => orders.filter(() => status === 'open'),
+    'orders.cancel': { call: ({ id }) => ({ cancelled: id }), approval: true },
+  });
+
+  const sandbox = createSandbox({ frame: { srcdoc: true }, warm: true });
+  const out = document.getElementById('out');
+
+  document.getElementById('run').onclick = async () => {
+    const code = document.getElementById('code').value;
+    const result = await sandbox.run({
+      code, functions,
+      approval: {
+        mode: 'collect',
+        onApproval: async (pending) => {
+          const ok = confirm(`Run ${pending.length} operation(s)?\n` + pending.map(p => `${p.fn} ${JSON.stringify(p.input)}`).join('\n'));
+          return { all: ok ? 'approve' : 'reject' };
+        },
+      },
+    });
+    out.textContent = JSON.stringify(result, null, 2);
+  };
+</script>
+</body>
+</html>
