@@ -1,0 +1,33 @@
+{
+  "name": "browser-sandbox-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "browser-sandbox.faustine.ai \u2014 the site and documentation of @faustine-ai/browser-sandbox, built from the README.",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "node --experimental-strip-types scripts/markdown.mts",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "geist": "^1.7.2",
+    "marked": "^15.0.0",
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "shiki": "^3.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

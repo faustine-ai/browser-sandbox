@@ -34,3 +34,15 @@ jobs:
         with:
           name: playwright-${{ matrix.project }}
           path: test-results
+  site:
+    # browser-sandbox.faustine.ai is built from site/ (Next.js static export)
+    # on push to main by the host; this job catches a broken build earlier.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: site/package-lock.json }
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site

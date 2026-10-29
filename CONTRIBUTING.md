@@ -21,6 +21,7 @@ src/ai.ts, src/codemode.ts, src/tanstack.ts   adapters
 test/unit       node tests; `inprocess.ts` runs the real worker runtime against the real host engine through a cloning fake port
 test/browser    Playwright: runs, approval, limits, CSP hosts, escape attempts, timings
 test/fixtures   the fixture server (three host pages, /sandbox) and the in-page harness
+site/           browser-sandbox.faustine.ai: a Next.js static export; the docs pages are the README split at its `##` headings (`npm run dev` inside site/)
 ```
 
 Rules:
