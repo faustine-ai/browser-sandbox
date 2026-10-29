@@ -1,0 +1,1 @@
+browser-sandbox by Faustine: run agent-generated code in your web app, safely.

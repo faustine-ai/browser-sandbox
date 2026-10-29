@@ -17,10 +17,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const s = sectionBySlug(slug);
   if (!s) return {};
   const firstLine = s.body.split("\n").find((l) => l.trim() && !l.startsWith("```") && !l.startsWith("#") && !l.startsWith("|")) ?? "";
+  const description = firstLine.replace(/[`*_\[\]]/g, "").slice(0, 200);
+  const title = `${s.nav} — browser-sandbox`;
   return {
     title: s.nav,
-    description: firstLine.replace(/[`*_\[\]]/g, "").slice(0, 200),
+    description,
     alternates: { canonical: `/docs/${s.slug}` },
+    openGraph: { title, description, url: `/docs/${s.slug}` },
+    twitter: { title, description },
   };
 }
 

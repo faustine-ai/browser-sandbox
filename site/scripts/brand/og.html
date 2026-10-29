@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --iris:#6c5ce7; --iris-300:#a99df5; --ink:#0b0918; --ink-2:#12102a; --ink-line:#2a2650; --mint:#25e0a4; --amber:#f5b83d; --rose:#ff6b8b; }
+  * { box-sizing:border-box; margin:0; }
+  html,body { width:1200px; height:630px; overflow:hidden; }
+  body { font-family:"Geist", ui-sans-serif, system-ui, sans-serif; color:#fff; background:var(--ink); position:relative; }
+  .glow { position:absolute; border-radius:9999px; filter:blur(90px); opacity:.55; }
+  .g1 { width:640px; height:640px; left:640px; top:-260px; background:radial-gradient(closest-side, #5a45d8, transparent); }
+  .g2 { width:520px; height:520px; left:-180px; top:300px; background:radial-gradient(closest-side, #2c2179, transparent); opacity:.7; }
+  .card { position:absolute; inset:0; padding:72px 80px; display:flex; flex-direction:column; justify-content:space-between; }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand .name { font-size:30px; font-weight:600; letter-spacing:-.02em; }
+  .brand .by { font-family:"Geist Mono", ui-monospace, monospace; font-size:19px; opacity:.5; margin-left:4px; }
+  h1 { font-size:76px; line-height:1.04; letter-spacing:-.035em; font-weight:600; max-width:980px; }
+  h1 .safe { color:var(--iris-300); }
+  .sub { margin-top:26px; font-size:27px; line-height:1.4; color:rgba(255,255,255,.62); max-width:900px; }
+  .foot { display:flex; align-items:center; justify-content:space-between; }
+  .pill { white-space:nowrap; display:inline-flex; align-items:center; gap:12px; font-family:"Geist Mono", ui-monospace, monospace; font-size:22px; padding:14px 24px; border-radius:9999px; background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.15); color:rgba(255,255,255,.88); }
+  .pill .d { color:var(--iris-300); }
+  .url { font-family:"Geist Mono", ui-monospace, monospace; font-size:21px; color:rgba(255,255,255,.45); }
+  .chips { display:flex; gap:10px; font-family:"Geist Mono", ui-monospace, monospace; font-size:17px; }
+  .chip { padding:9px 15px; border-radius:9999px; box-shadow:inset 0 0 0 1px var(--ink-line); background:var(--ink-2); color:rgba(255,255,255,.75); display:flex; align-items:center; gap:9px; }
+  .dot { width:8px; height:8px; border-radius:9999px; }
+</style></head>
+<body>
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="card">
+    <div class="brand">
+      <svg width="46" height="46" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#fff"/><rect x="8" y="8" width="3" height="16" rx="1" fill="#4c3dad"/><rect x="11.7" y="8" width="3" height="16" rx="1" fill="#4c3dad"/><rect x="15.2" y="9" width="3" height="15" rx="1" fill="#4c3dad" transform="rotate(15 16.7 24)"/><rect x="18.8" y="10" width="3" height="14" rx="1" fill="#4c3dad" transform="rotate(26 20.3 24)"/></svg>
+      <span class="name">browser-sandbox</span><span class="by">by Faustine</span>
+    </div>
+    <div>
+      <h1>Run agent-generated code in your web app, <span class="safe">safely.</span></h1>
+      <p class="sub">A Worker inside an opaque-origin iframe. Your functions over a message channel, approval before the risky ones.</p>
+    </div>
+    <div class="foot">
+      <div class="pill"><span class="d">$</span> npm install @faustine-ai/browser-sandbox</div>
+      <span class="url">browser-sandbox.faustine.ai</span>
+    </div>
+  </div>
+</body></html>
