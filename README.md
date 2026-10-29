@@ -406,6 +406,12 @@ worker, mid-loop if need be.
 
 ## Integrations
 
+Faustine built this library for its own code mode in the browser, where
+the agent's program runs on the customer's page. It is meant for custom
+code mode implementations like that one, for the code mode libraries
+below, and for any other system, agentic loop or not, that has to run
+agent-generated code in the browser.
+
 ### AI SDK (`useChat`, `Chat`)
 
 The AI SDK has one `onToolCall` per chat and answers through
@@ -463,7 +469,23 @@ tools: {
 Put `describe(functions)` in the system prompt so the model writes the
 names the code will find.
 
+**Isn't code mode already in the AI SDK?** On the server. The program of
+`@ai-sdk/code-mode` runs in QuickJS inside a Node worker, "is not
+available in browser or edge runtimes", and reaches server tools only. In
+the browser the AI SDK gives you client tools and nothing that runs a
+program against them; `runCode` is that piece. The two can combine in one
+chat: server tools behind `code_mode`, page functions behind `runCode`.
+
 ### Cloudflare `@cloudflare/codemode`
+
+Cloudflare's `createCodeTool` owns the prompt and the tool wiring and
+delegates the run to an `Executor`. It ships two: Dynamic Workers on the
+server, and `IframeSandboxExecutor` for the browser, an iframe without a
+worker, which cannot stop a synchronous loop (documented, 30 s timeout),
+needs `'unsafe-inline'` in its CSP and has no approval hook.
+`asExecutor(sandbox)` is a third executor for the same `createCodeTool`:
+a worker it can terminate, a frame that works under a strict CSP, and the
+approval modes. Their server executor stays for server tools.
 
 ```ts
 import { asExecutor } from '@faustine-ai/browser-sandbox/codemode';
@@ -477,6 +499,15 @@ providers as `codemode.<provider>.<fn>`. `asExecutor(sandbox, { root,
 needsApproval, approval, caps })` for the policies.
 
 ### TanStack AI
+
+TanStack's `createCodeMode` writes the prompt and compiles the bindings;
+the program runs through a pluggable `IsolateDriver`, and the driver it
+ships is QuickJS compiled to WASM, with no approval step.
+`asIsolateDriver(sandbox)` is a driver for the same `createCodeMode`: the
+page's own engine instead of a second one, structured clone instead of
+re-encoding `File` and `Blob` by hand, about 8 KB instead of a 1 MB WASM
+payload, and the approval modes. Their QuickJS driver stays the choice on
+the server or when you want an engine separate from the page's.
 
 ```ts
 import { asIsolateDriver } from '@faustine-ai/browser-sandbox/tanstack';

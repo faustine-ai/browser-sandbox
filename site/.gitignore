@@ -1,0 +1,9 @@
+/node_modules
+/.next/
+/out/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+/public/docs/*.md
+/public/llms.txt
+/public/llms-full.txt
