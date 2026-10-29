@@ -3,7 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { SITE } from "@/lib/links";
-const TITLE = "browser-sandbox — Run model-written code in the browser, safely";
+const TITLE = "browser-sandbox — Run agent-generated code in your web app, safely";
 const DESCRIPTION =
   "@faustine-ai/browser-sandbox runs the JavaScript an agent writes inside a Worker in an opaque-origin iframe: no network, no DOM, no storage, only the functions you hand it. Approval at the bridge, real timeouts, adapters for the AI SDK, Cloudflare codemode and TanStack AI. MIT.";
 
