@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatArg, makeConsole } from '../../src/worker/console';
-import { makePending, pendingSeq, PENDING_OBSERVED } from '../../src/worker/pending';
+import { containsPending, makePending, pendingSeq, PENDING_OBSERVED } from '../../src/worker/pending';
 import { lineOf, shapeOf, startRuntime } from '../../src/worker/runtime';
 import { harden, REMOVED_GLOBALS } from '../../src/worker/scope';
 import { buildTree } from '../../src/worker/tree';
@@ -52,6 +52,21 @@ describe('pending', () => {
     throws(() => Object.setPrototypeOf(p, null));
     throws(() => Object.getOwnPropertyDescriptor(p, 'x'));
     throws(() => Object.defineProperty(p, 'x', { value: 1 }));
+  });
+
+  it('containsPending finds a pending value nested in arrays, objects, Maps and Sets, and nothing else', () => {
+    const p = makePending(1);
+    expect(containsPending(p)).toBe(true);
+    expect(containsPending([1, { a: [p] }])).toBe(true);
+    expect(containsPending(new Map([['k', p]]))).toBe(true);
+    expect(containsPending(new Set([{ x: p }]))).toBe(true);
+    expect(containsPending({ a: 1, b: [2, { c: 'x' }] })).toBe(false);
+    expect(containsPending(new Map([['k', [1]]]))).toBe(false);
+    expect(containsPending(new Set([{ x: 1 }]))).toBe(false);
+    expect(containsPending(new Date())).toBe(false);
+    const cyclic: Record<string, unknown> = {};
+    cyclic.self = cyclic;
+    expect(containsPending(cyclic)).toBe(false);
   });
 
   it('pendingSeq swallows a throwing object', () => {
@@ -148,6 +163,18 @@ describe('runtime helpers', () => {
     port.onmessage!({ data: { t: 'abort', runId: 'r' } });
     await new Promise((r) => setTimeout(r, 50));
     expect(sent).toEqual([]);
+  });
+
+  it('returning a pending value ends the pass as PendingObserved, not as a CloneError', async () => {
+    const sent: unknown[] = [];
+    const port = { onmessage: null as ((ev: { data: unknown }) => void) | null, postMessage: (m: unknown) => sent.push(structuredClone(m)) };
+    startRuntime(port, { scope: {} });
+    port.onmessage!({ data: { t: 'run', runId: 'r', code: 'const out = []; out.push(await sdk.del({ id: 1 })); return { out }', root: 'sdk', fnNames: ['del'], positional: [], spread: false, valueNames: [], values: {}, caps: { maxOutputBytes: 100, maxLogLines: 1, maxLogChars: 10 }, serialize: true } });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(sent[0]).toMatchObject({ t: 'call', callId: 'r:1', fn: 'del' });
+    port.onmessage!({ data: { t: 'result', runId: 'r', callId: 'r:1', ok: true, pending: true, seq: 1 } });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(sent[1]).toMatchObject({ t: 'done', ok: false, pendingObserved: true, error: { name: PENDING_OBSERVED } });
   });
 
   it('a done that cannot be cloned becomes a CloneError done; a call post that throws rejects the call', async () => {

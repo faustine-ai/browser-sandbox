@@ -144,6 +144,15 @@ test.describe('approval', () => {
     expect(final.value).toBe(true);
   });
 
+  test('collect: returning a deferred result (even nested) ends the pass as pending, then resumes', async ({ page }) => {
+    const r = await run(page, 's', 'const out = []; for (const id of [1, 2]) out.push(await sdk.del({ id })); return { out }', { approval: 'collect' });
+    expect(r.status).toBe('pending');
+    expect(r.pending?.map((p) => p.input)).toEqual([{ id: 1 }, { id: 2 }]);
+    const done = await resume(page, { all: 'approve' });
+    expect(done.status).toBe('ok');
+    expect((done.value as { out: unknown[] }).out).toHaveLength(2);
+  });
+
   test('collect: partial decisions; a rejected one throws into the code on resume', async ({ page }) => {
     const r = await run(page, 's', 'const out = []; for (const id of [1, 2]) { try { await sdk.del({ id }); out.push("ok" + id) } catch (e) { out.push(e.name) } } return out', { approval: 'collect' });
     expect(r.status).toBe('pending');
