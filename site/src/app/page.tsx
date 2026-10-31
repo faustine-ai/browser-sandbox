@@ -141,6 +141,9 @@ export default function Home() {
                 <Button href="/docs/getting-started/" variant="primary" size="lg">
                   Get started <ArrowRight />
                 </Button>
+                <Button href="/try/" variant="ghostDark" size="lg">
+                  Try it live
+                </Button>
                 <Button href={LINKS.github} variant="ghostDark" size="lg" external>
                   <Icons.Github /> GitHub
                 </Button>

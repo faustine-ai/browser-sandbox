@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "browser-sandbox.faustine.ai \u2014 the site and documentation of @faustine-ai/browser-sandbox, built from the README.",
+  "description": "browser-sandbox.faustine.ai — the site and documentation of @faustine-ai/browser-sandbox, built from the README.",
   "engines": {
     "node": "22.x"
   },
@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@faustine-ai/browser-sandbox": "0.1.0",
     "geist": "^1.7.2",
     "marked": "^15.0.0",
     "next": "16.2.10",

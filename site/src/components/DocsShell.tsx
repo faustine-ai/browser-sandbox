@@ -59,6 +59,12 @@ export function DocsShell({ active, children }: { active?: Section; children: Re
                   );
                 })}
               </ul>
+              <a
+                href="/try/"
+                className="mt-1 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.9rem] font-medium text-iris-700 transition-colors hover:bg-iris-50"
+              >
+                Try it <ArrowRight className="h-3.5 w-3.5" />
+              </a>
               <div className="mt-6 border-t border-zinc-100 pt-4">
                 <a href={LINKS.github} target="_blank" rel="noreferrer" className="block px-3 py-1 text-[0.82rem] text-zinc-500 hover:text-zinc-900">
                   GitHub ↗
@@ -98,7 +104,12 @@ export function DocsShell({ active, children }: { active?: Section; children: Re
                     </span>
                   </a>
                 ) : (
-                  <span className="flex-1" />
+                  <a href="/try/" className="group flex-1 rounded-2xl border border-zinc-200 p-4 text-right transition-colors hover:border-iris-200 hover:bg-iris-50/40">
+                    <span className="mono-label text-zinc-400">Next</span>
+                    <span className="mt-1 flex items-center justify-end gap-1.5 text-[0.95rem] font-medium text-zinc-800">
+                      Try it in this page <ArrowRight className="text-iris-600 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </a>
                 )}
               </div>
             ) : null}
