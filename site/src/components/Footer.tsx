@@ -13,6 +13,7 @@ const COLUMNS: { title: string; links: Link[] }[] = [
       { label: "Security model", href: "/docs/security-model/" },
       { label: "API reference", href: "/docs/api-reference/" },
       { label: "FAQ", href: "/docs/faq/" },
+      { label: "Try it", href: "/try/" },
     ],
   },
   {

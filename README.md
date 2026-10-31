@@ -37,6 +37,9 @@ your page                                    sandbox frame (origin "null")
 Tested in Chromium, Firefox and WebKit on every change, including a suite
 of escape attempts that must all fail (see [Security model](#security-model)).
 
+Try it without installing anything: <https://browser-sandbox.faustine.ai/try/>
+runs this package in your browser, with editable functions and code.
+
 ## Contents
 
 1. [Why a frame and a worker](#why-a-frame-and-a-worker)

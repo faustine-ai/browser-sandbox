@@ -47,3 +47,28 @@ export function pendingSeq(value: unknown): number | null {
     return null;
   }
 }
+
+/**
+ * Whether a value is, or carries, a pending value: the run's return value
+ * is looked at by the host, so returning one is an observation too. Walks
+ * arrays, plain objects, Maps and Sets; anything else cannot hold a proxy
+ * that structured clone would reach.
+ */
+export function containsPending(value: unknown, seen = new Set<object>()): boolean {
+  if (pendingSeq(value) !== null) return true;
+  if (typeof value !== 'object' || value === null || seen.has(value)) return false;
+  seen.add(value);
+  if (Array.isArray(value)) return value.some((v) => containsPending(v, seen));
+  if (value instanceof Map) {
+    for (const [k, v] of value) if (containsPending(k, seen) || containsPending(v, seen)) return true;
+    return false;
+  }
+  if (value instanceof Set) {
+    for (const v of value) if (containsPending(v, seen)) return true;
+    return false;
+  }
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== Object.prototype && proto !== null) return false;
+  for (const k of Object.keys(value)) if (containsPending((value as Record<string, unknown>)[k], seen)) return true;
+  return false;
+}

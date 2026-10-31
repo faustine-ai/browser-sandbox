@@ -2,7 +2,7 @@
 // be unit-tested with a fake port. `entry.ts` wires it to the real worker.
 import type { DoneMessage, ErrorShape, HostToWorker, LogLevel, RunMessage, WorkerToHost } from '../bridge/protocol';
 import { makeConsole } from './console';
-import { makePending, PENDING_OBSERVED } from './pending';
+import { containsPending, makePending, PENDING_OBSERVED, pendingError } from './pending';
 import { buildTree } from './tree';
 
 export interface PortLike {
@@ -104,6 +104,9 @@ export function startRuntime(port: PortLike, host: RuntimeHost): void {
     }
     try {
       const value = await fn(tree, captured.console, ...m.valueNames.map((n) => m.values[n]), ...bare.map((k) => tree[k]));
+      // Returning a pending value (or something that carries one) is an
+      // observation: the pass ends there, like a property read would.
+      if (containsPending(value)) throw pendingError();
       const size = serialisedSize(value);
       if (size > m.caps.maxOutputBytes) {
         finish({ ok: false, error: { name: 'SandboxLimit', message: `result larger than ${m.caps.maxOutputBytes} bytes (${size})` }, tooLarge: true });

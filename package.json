@@ -1,6 +1,6 @@
 {
   "name": "@faustine-ai/browser-sandbox",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Run model-written JavaScript in the browser inside a worker in an opaque-origin frame: no network, no DOM, only the functions you hand it. Approval at the bridge, real timeouts, adapters for the AI SDK, Cloudflare codemode and TanStack AI.",
   "keywords": ["sandbox", "browser", "worker", "iframe", "csp", "code-mode", "ai", "llm", "tools", "ai-sdk"],
   "license": "MIT",

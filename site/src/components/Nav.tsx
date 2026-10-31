@@ -10,6 +10,7 @@ const LINKS_NAV = [
   { label: "API", href: "/docs/api-reference/" },
   { label: "Security", href: "/docs/security-model/" },
   { label: "FAQ", href: "/docs/faq/" },
+  { label: "Try it", href: "/try/" },
 ];
 
 /**
