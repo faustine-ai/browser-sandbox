@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 — unreleased
+## 0.1.1 — 2026-10-31
 
 - `collect` mode: returning a pending value from the code, alone or nested
   in an array, object, Map or Set, now ends the pass as `pending` (it is an
